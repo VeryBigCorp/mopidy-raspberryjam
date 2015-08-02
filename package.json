@@ -3,7 +3,10 @@
   "author_email": "",
   "github_username": "VeryBigCorp, ethomas42",
   "dist_name": "Mopidy-Raspberry-Jam",
-  "repo_name": "mopidy-raspberryjam",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:martijnboland/moped.git"
+  },
   "ext_name": "raspberryjam",
   "short_description": "Web Client for Social Music Playing via the Raspberry Pi or other Embedded Devices",
   "year": "2015",
