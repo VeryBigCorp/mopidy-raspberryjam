@@ -1,0 +1,11 @@
+{
+  "author_full_name": "Ryan Babaie and Evan Thomas",
+  "author_email": "",
+  "github_username": "VeryBigCorp, ethomas42",
+  "dist_name": "Mopidy-Raspberry-Jam",
+  "repo_name": "mopidy-raspberryjam",
+  "ext_name": "raspberryjam",
+  "short_description": "Web Client for Social Music Playing via the Raspberry Pi or other Embedded Devices",
+  "year": "2015",
+  "version": "0.0.1"
+}
