@@ -7,3 +7,6 @@ include mopidy_raspberryjam/ext.conf
 include tox.ini
 
 recursive-include tests *.py
+recursive-include vendor
+recursive-include src
+recursive-include mopidy_raspberryjam/static *
