@@ -138,6 +138,7 @@
 
 .sidebar-img {
     display:inline !important;
+    margin-right:10px;
 }
 
 .queue-table {
@@ -146,13 +147,74 @@
 
 .song-table {
     width:100%;
+    height:100%;
 }
-
-.queue-table > tr > td{
+.queue-table > tr > td {
     margin-bottom:10px;
 }
 
 .vote-table {
     width:100%;
     padding:10px 0px;
+}
+
+.player {
+    background-color:#B8002E;
+    color:white;
+    padding:10px;
+    margin-bottom:20px;
+}
+
+.player-albumart > img {
+    width:100%;
+    height:100%;
+}
+
+.player-info {
+    
+}
+
+.player-song-table {
+    width:100%;
+    height:100%;
+}
+
+.player-song-info {
+    height:80px;
+    width:100%;
+}
+
+.player-controls {
+    width:100%;
+}
+
+.player-progress {
+    margin-bottom:0px;
+    width:100%;
+}
+
+@media(max-width:970px){
+    .player {
+        margin-bottom:0px;
+        background-color:white;
+    }
+
+    .player-title, .player-artist {
+        text-align:center;
+        color:black !important;
+        font-size:18px;
+    }
+
+    .player-albumart {
+        padding:10px;
+        background-color:#CCC;
+    }
+
+    .player-info {
+        position:relative;
+        background-color:white;
+        padding:20px;
+        top:-100px;
+        left:0px;
+    }
 }

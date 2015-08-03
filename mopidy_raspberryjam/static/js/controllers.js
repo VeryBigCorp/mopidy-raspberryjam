@@ -1,6 +1,6 @@
-var raspberryjamApp = angular.module("raspberryjamApp", []);
+var raspberryControllers = angular.module('raspberryjamControllers', []);
 
-raspberryjamApp.controller('QueueCtrl', function($scope){
+raspberryControllers.controller('QueueCtrl', function($scope){
 	$scope.queue = [
 		{title: "Somewhere in the Between", artist: "Streetlight Manifesto", runtime:254},
 		{title: "Damn", artist: "John Mackey", runtime: 326}
@@ -15,4 +15,8 @@ raspberryjamApp.controller('QueueCtrl', function($scope){
 
 		return str + (hrs > 0 ? hrs+ " hrs "  : "") + (mins > 0 ? mins + " min " : "") + (secs > 0 ? secs + " s" : "");
 	}
+});
+
+raspberryControllers.controller('PlayingCtrl', function($scope){
+	$scope.controllable = false;
 });

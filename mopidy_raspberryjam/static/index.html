@@ -11,12 +11,14 @@
     <link rel="stylesheet" href="./css/rpijam.css">
     <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
     <script src="vendor/angular.min.js"></script>
+    <script src="vendor/angular-route.js"></script>
+    <script src="vendor/jquery-1.11.3.min.js"></script>
     <script src="./js/controllers.js"></script>
     <script src="./js/app.js"></script>
     <script src="vendor/bootstrap.min.js"></script>
   </head>
 
-  <body ng-controller="QueueCtrl">
+  <body>
      <div id="wrapper">
 
         <!-- Sidebar -->
@@ -52,11 +54,11 @@
         <div class="page-content-wrapper">
           <div class="container-fluid">
             <div class="row">
+              <div class="player" ng-controller="PlayingCtrl">
+                <div ng-include="'./partials/now_playing.html'"></div>
+              </div>
               <div class="col-xs-12">
-                <div class="panel panel-info">
-                  Now playing
-                </div>
-                <div class="panel panel-primary">
+                <div class="panel panel-primary" ng-controller="QueueCtrl">
                   <div class="panel-heading">
                     <h3 class="panel-title"><b>Queue ({{queue.length}})</b></h3>
                   </div>
