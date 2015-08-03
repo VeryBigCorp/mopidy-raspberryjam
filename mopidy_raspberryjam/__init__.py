@@ -32,5 +32,5 @@ class Extension(ext.Extension):
     def setup(self, registry):
         registry.add('http:static', {
             'name': self.ext_name,
-            'path': os.path.join(os.path.dirname(__file__), 'static'),
+            'path': os.path.join(os.path.dirname(__file__), '..', 'src'),
         })
