@@ -26,7 +26,7 @@
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
                     <a href="#">
-                        <img class="brand-logo" src="./assets/rpi_logo.png"/> Raspberry Jam
+                        <img class="brand-logo" src="./assets/rpi_logo.png"/> <i style="display:inline;" class="fa fa-music"></i>aspberry Jam
                     </a>
                 </li>
                 <li>
@@ -47,6 +47,10 @@
                 <li>
                     <a href="#"><i class="fa fa-youtube-play sidebar-img"></i> YouTube</a>
                 </li>
+
+                <li>
+                    <a href="#"><i class="fa fa-microphone sidebar-img"></i> Radio/Stream</a>
+                </li>
             </ul>
         </div>
 
@@ -54,21 +58,22 @@
         <div class="page-content-wrapper">
           <div class="container-fluid">
             <div class="row">
-              <div class="player" ng-controller="PlayingCtrl">
-                <div ng-include="'./partials/now_playing.html'"></div>
+              <div class="player"  id="player" ng-controller="PlayingCtrl">
+                <div class="hidden-md hidden-lg" ng-include="'./partials/now_playing_mobile.html'"></div>
+                <div class="hidden-xs hidden-sm" ng-include="'./partials/now_playing.html'"></div>
               </div>
               <div class="col-xs-12">
                 <div class="panel panel-primary" ng-controller="QueueCtrl">
                   <div class="panel-heading">
-                    <h3 class="panel-title"><b>Queue ({{queue.length}})</b></h3>
+                    <h3 class="panel-title"><b>Queue ({{queue.length}} songs, {{timeToStr(queueTimeTotal());}})</b></h3>
                   </div>
                   <div class="panel-body">
                     <button id="sidebarToggle"><i class="fa fa-bars"></i></button>
                     <table class="queue-table">
                       <tr class='queue-row' ng-repeat="song in queue track by $index">
                         <td style="padding-right:10px;"><b>{{$index+1}}.</b></td>
-                        <td style="max-width:80px;height:80px;"><img style="max-width:100%; max-height:100%;" src="http://www.lyriki.com/images/thumb/4/40/AlbumArt-Streetlight_Manifesto-Somewhere_in_the_Between_%282007%29.jpg/250px-AlbumArt-Streetlight_Manifesto-Somewhere_in_the_Between_%282007%29.jpg"/></td>
-                        <td style="padding:0px 0px;">
+                        <td style="max-width:80px;height:80px;"><img style="max-width:100%; max-height:100%;" src="{{song.img}}"/></td>
+                        <td style="">
                           <table class="song-table">
                             <tr>
                               <td>{{song.title}}</td>
@@ -77,6 +82,10 @@
                             <tr>
                               <td><small style="color:grey;">{{song.artist}}</small></td>
                               <td>{{}}</td>
+                            </tr>
+                            <tr>
+                              <td><small><i>{{song.genre}}</i></small></td>
+                              <td></td>
                             </tr>
                           </table>
                         </td>
