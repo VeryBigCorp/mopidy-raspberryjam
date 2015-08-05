@@ -4,7 +4,7 @@ function timeToStr(seconds) {
   var mins = Math.floor((seconds - hrs*3600)/ 60);
   var secs = Math.floor((seconds-hrs*3600-mins*60));
 
-  return str + (hrs > 0 ? bufferZeros(hrs) + ":"  : "") + (mins > 0 ? bufferZeros(mins) + ":" : "") + bufferZeros(secs);
+  return str + (hrs > 0 ? bufferZeros(hrs) + ":" : "") + (mins > 0 ? bufferZeros(mins) + ":" : "") + bufferZeros(secs);
 }
 
 function bufferZeros(amount) {
@@ -17,13 +17,13 @@ var raspberryjamApp = angular.module("raspberryjamApp", [
 ]);
 
 function populatePlayer() {
-  mopidy.playback.getCurrentTrack().done(function(track){
+  mopidy.playback.getCurrentTrack().done(function(track) {
     if(track){
       //do some fancy shit to get a list of the artist names
       $("#player-artist").html(track.artists.reduce(function(a, b){ return {name: a.name + ", " + b.name} }).name);
       $("#player-title").html(track.name);
       $("#player-length").html(timeToStr(track.length / 1000));
-      var remainingTime = track.length - mopidy.playback.getTimePosition;
+      var remainingTime = track.length - mopidy.playback.getTimePosition();
       $("#player-remaining").html(timeToStr( (remainingTime) / 1000 )).attr("aria-valuenow", 100.0 * remainingTime / track.length).css("width", 100.0 * remainingTime / track.length + "%");
     } else {
       $("#player-artist").html("");
@@ -47,7 +47,9 @@ $(document).ready(function() {
     populatePlayer();
   });
   
-  populatePlayer();
+  mopidy.on("state:online", function() {
+    populatePlayer();
+  });
   
   $(window).unload( function() {
     mopidy.close();
