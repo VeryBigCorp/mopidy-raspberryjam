@@ -19,7 +19,8 @@ var raspberryjamApp = angular.module("raspberryjamApp", [
 function populatePlayer() {
   mopidy.playback.getCurrentTrack().done(function(track){
     if(track){
-      $("#player-artist").html(track.artists.name.join(", "));
+      //do some fancy shit to get a list of the artist names
+      $("#player-artist").html(track.artists.reduce(function(a, b){ return {name: a.name + ", " + b.name} }).name);
       $("#player-title").html(track.name);
       $("#player-length").html(timeToStr(track.length));
     }
