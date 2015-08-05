@@ -22,7 +22,7 @@ function populatePlayer() {
       //do some fancy shit to get a list of the artist names
       $("#player-artist").html(track.artists.reduce(function(a, b){ return {name: a.name + ", " + b.name} }).name);
       $("#player-title").html(track.name);
-      $("#player-length").html(timeToStr(track.length));
+      $("#player-length").html(timeToStr(track.length / 1000));
     }
   });
 }
