@@ -19,7 +19,7 @@ var raspberryjamApp = angular.module("raspberryjamApp", [
 function populatePlayer() {
   mopidy.playback.getCurrentTrack().done(function(track){
     if(track){
-      $("#player-artist").html(track.artists.join(", "));
+      $("#player-artist").html(track.artists.name.join(", "));
       $("#player-title").html(track.name);
       $("#player-length").html(timeToStr(track.length));
     }
@@ -34,4 +34,8 @@ $(document).ready(function(){
   mopidy = new Mopidy();
   
   mopidy.on(console.log.bind(console));
+  
+  mopidy.on("event:playbackStateChanged", function() {
+    populatePlayer();
+  });
 });
