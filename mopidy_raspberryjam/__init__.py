@@ -34,3 +34,7 @@ class Extension(ext.Extension):
             'name': self.ext_name,
             'path': os.path.join(os.path.dirname(__file__), 'static'),
         })
+
+
+	from .backend import RaspberryJamBackend
+        registry.add('backend', RaspberryJamBackend)

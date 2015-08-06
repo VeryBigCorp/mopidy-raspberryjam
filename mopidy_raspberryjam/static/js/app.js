@@ -11,6 +11,24 @@ function bufferZeros(amount) {
   return (amount < 10 ? "0" + amount : amount);
 }
 
+
+// Gets the album art for a specified URI (spotify from the Spotify API). Move this to async loading
+function getAlbumArt(uri){
+  if(uri.indexOf("spotify") !== -1){
+    var json = JSON.parse($.ajax({url: "https://api.spotify.com/v1/albums/"+stripIDFromURI(uri), async: false, type: "GET"}).responseText);
+    console.log(json);
+    return json.images[0].url;
+  }
+}
+
+function stripIDFromURI(uri){
+  var ind;
+  if((ind = uri.indexOf(":")) !== -1){
+    return stripIDFromURI(uri.slice(ind+1));  
+  }
+  return uri;
+}
+
 var raspberryjamApp = angular.module("raspberryjamApp", [
   'ngRoute',
   'raspberryjamControllers'
@@ -21,12 +39,12 @@ var trackID;
 function togglePositionTrack(state, length) {
   var progress = $("[name='player-remaining']");
   clearInterval(trackID);
-  console.log("toggling track to " + state);
   if (state) {
     progress.parent().show();
 
     trackID = setInterval(function () {
       mopidy.playback.getTimePosition().done(function (pos) {
+        pos = Math.min(length, pos);
         var remaining = length - pos;
         progress.html(timeToStr((remaining) / 1000) + " remaining...");
         progress.attr("aria-valuenow", 100.0 * pos / length);
@@ -51,7 +69,10 @@ function populatePlayer() {
       }).name);
       $("[name='player-title']").html(track.name);
       $("[name='player-length']").html(timeToStr(track.length / 1000));
+      $("[name='player-album']").html(track.album.name);
       $("[name='player-genre']").html("");
+
+      $("[name='player-albumart']").attr('src',getAlbumArt(track.album.uri));
 
       togglePositionTrack(true, track.length);
     } else {
@@ -78,6 +99,8 @@ $(document).ready(function () {
   mopidy.on("state:online", function () {
     populatePlayer();
   });
+
+  //mopidy.on(console.log.bind(console));
 
   $(window).unload(function () {
     mopidy.close();

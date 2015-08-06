@@ -1,18 +1,20 @@
 <div class="card">
     <div class="card-image">
-        <img class="img-responsive" src="http://www.lyriki.com/images/thumb/4/40/AlbumArt-Streetlight_Manifesto-Somewhere_in_the_Between_%282007%29.jpg/250px-AlbumArt-Streetlight_Manifesto-Somewhere_in_the_Between_%282007%29.jpg">
+        <img class="img-responsive" name="player-albumart" src=""/>
     </div><!-- card image -->
 
     <div class="card-content">
-        <span name="player-title" class="card-title">We Will Fall Together</span><br/>
-        <span name="player-artist" class="card-subtitle"><i>Streetlight Manifesto</i></span><br/>
-        <span name="player-album" class="card-subtitle">Somewhere in the Between</span><br/>
-        <span name="player-genre" class="card-subtitle">Ska</span>
-        <span name="player-length" class="card-subsubtitle">6m26s</span>
+        <span name="player-title" class="card-title"></span><br/>
+        <span name="player-artist" style="font-style:italic;" class="card-subtitle"></span><br/>
+        <span name="player-album" class="card-subtitle"></span><br/>
+	      <div class="row">
+          <div class="col-xs-6"><span name="player-genre" class="card-subtitle"></span></div>
+          <div class="col-xs-6"><span name="player-length" class="card-subsubtitle"></span></div>
+	      </div>
     </div><!-- card content -->
     <div class="card-action">
       <div class="progress player-progress">
-        <div id="player-remaining" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+        <div name="player-remaining" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
       </div>
     </div>
 </div>
