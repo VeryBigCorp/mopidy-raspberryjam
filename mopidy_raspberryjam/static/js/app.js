@@ -43,10 +43,10 @@ function populatePlayer() {
     if(track){
       //do some fancy shit to get a list of the artist names
       $("#player").show();
-      $("#player-artist").html(track.artists.reduce(function(a, b){ return {name: a.name + ", " + b.name} }).name);
-      $("#player-title").html(track.name);
-      $("#player-length").html(timeToStr(track.length / 1000));
-      $("#player-genre").html("");
+      $("[name='player-artist']").html(track.artists.reduce(function(a, b){ return {name: a.name + ", " + b.name} }).name);
+      $("[name='player-title']").html(track.name);
+      $("[name='player-length']").html(timeToStr(track.length / 1000));
+      $("[name='player-genre]").html("");
 
       togglePositionTrack(true, track.length);
     } else {
@@ -72,7 +72,6 @@ $(document).ready(function() {
   
   mopidy.on("state:online", function() {
     populatePlayer();
-    console.log("Online...");
   });
   
   $(window).unload( function() {
