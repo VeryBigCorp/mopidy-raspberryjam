@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="raspberryjamApp">
+<html lang="en" ng-app="raspberryjamApp" ng-controller="MainCtrl">
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-    <title ng-bind-template="{{pageTitle}} | RaspberryJam"></title>
+    <title ng-bind="Page.title()">Raspberry Jam</title>
     <link rel="stylesheet" href="vendor/css/bootstrap.min.css">
     <link rel="stylesheet" href="vendor/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="./css/rpijam.css">
@@ -31,13 +31,13 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-list sidebar-img"></i> Queue</a>
+                    <a href="#/"><i class="fa fa-list sidebar-img"></i> Queue</a>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-dot-circle-o sidebar-img"></i> Albums</a>
+                    <a href="#/albums"><i class="fa fa-dot-circle-o sidebar-img"></i> Albums</a>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-users sidebar-img"></i> Artists</a>
+                    <a href="#/artists"><i class="fa fa-users sidebar-img"></i> Artists</a>
                 </li>
                 <li>
                     <a href="#"><i class="fa fa-music sidebar-img"></i> Songs</a>
@@ -52,56 +52,21 @@
                 <li>
                     <a href="#"><i class="fa fa-microphone sidebar-img"></i> Radio/Stream</a>
                 </li>
+		<li>
+                    <a href="#"><i class="fa fa-gears sidebar-img"></i> Settings</a>
+                </li>
             </ul>
         </div>
 
-
         <div class="page-content-wrapper">
           <div class="container-fluid">
-            <div class="row">
-              <div class="player"  id="player" ng-controller="PlayingCtrl">
-                <div class="hidden-md hidden-lg" ng-include="'./partials/now_playing_mobile.html'"></div>
-                <div class="hidden-xs hidden-sm" ng-include="'./partials/now_playing.html'"></div>
-              </div>
-              <div class="col-xs-12">
-                <div class="panel panel-primary" ng-controller="QueueCtrl">
-                  <div class="panel-heading">
-                    <h3 class="panel-title"><b>Queue ({{queue.length}} songs, {{timeToStr(queueTimeTotal());}})</b></h3>
-                  </div>
-                  <div class="panel-body">
-                    <button id="sidebarToggle"><i class="fa fa-bars"></i></button>
-                    <table class="queue-table">
-                      <tr class='queue-row' ng-repeat="song in queue track by $index">
-                        <td style="padding-right:10px;"><b>{{$index+1}}.</b></td>
-                        <td style="max-width:80px;height:80px;"><img style="max-width:100%; max-height:100%;" src="{{song.img}}"/></td>
-                        <td style="">
-                          <table class="song-table">
-                            <tr>
-                              <td>{{song.title}}</td>
-                              <td style="text-align:right"><small style="color:grey;">{{timeToStr(song.runtime);}}</small></td>
-                            </tr>
-                            <tr>
-                              <td><small style="color:grey;">{{song.artist}}</small></td>
-                              <td>{{}}</td>
-                            </tr>
-                            <tr>
-                              <td><small><i>{{song.genre}}</i></small></td>
-                              <td></td>
-                            </tr>
-                          </table>
-                        </td>
-                        <td style="text-align:right;">
-                          <table class="vote-table">
-                            <tr><td><i class="fa fa-angle-up"></i></td></tr>
-                            <tr><td><i class="fa fa-angle-down"></i></td></tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
+			<div class="row">
+			  <div class="player"  id="player" ng-controller="PlayingCtrl">
+				<div class="hidden-md hidden-lg" ng-include="'./partials/now_playing_mobile.html'"></div>
+				<div class="hidden-xs hidden-sm" ng-include="'./partials/now_playing.html'"></div>
+			  </div>
+            	<div ng-view></div>
+			</div>
           </div>
         </div>
       </div>

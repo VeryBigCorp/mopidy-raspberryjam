@@ -36,5 +36,5 @@ class Extension(ext.Extension):
         })
 
 
-	from .backend import RaspberryJamBackend
-        registry.add('backend', RaspberryJamBackend)
+	#from .backend import RaspberryJamBackend
+        #registry.add('backend', RaspberryJamBackend)
