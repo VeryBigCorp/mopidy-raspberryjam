@@ -389,3 +389,76 @@ p.description_content{
 	text-align:center;
     margin:0px;  
 }  
+
+
+//for the deets page yo
+.well {
+    margin-top:-20px;
+    background-color:#007FBD;
+    border:2px solid #0077B2;
+    text-align:center;
+    cursor:pointer;
+    font-size: 25px;
+    padding: 15px;
+    border-radius: 0px !important;
+}
+
+.well:hover {
+    margin-top:-20px;
+    background-color:#0077B2;
+    border:2px solid #0077B2;
+    text-align:center;
+    cursor:pointer;
+    font-size: 25px;
+    padding: 15px;
+    border-radius: 0px !important;
+    border-bottom : 2px solid rgba(97, 203, 255, 0.65);
+}
+
+
+.bg_blur{
+    height: 200px;
+    background-size: cover;
+padding: 20px;
+}
+
+.artist-header{
+    background-color: #75A928;
+    border-radius: 0px !important;
+}
+
+.header{
+    color : #FFF;
+}
+
+.picture{
+    height:150px;
+    width:150px;
+    position:absolute;
+    top: 75px;
+    left:-75px;
+}
+
+.picture_mob{
+    position: absolute;
+    width: 35%;
+    left: 35%;
+    bottom: 70%;
+}
+
+@media (max-width: 1170px) {
+
+}
+
+@media (max-width: 767px) {
+    .header {
+        text-align : center;
+        margin-top: 150px;
+    }
+    .nav{
+        margin-top : 30px;
+    }
+}
+
+
+

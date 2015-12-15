@@ -84,8 +84,16 @@ raspberryControllers.controller('ArtistsController', ['$rootScope','$scope','Pag
 	}
 }]);
 
-raspberryControllers.controller('ArtistsDetailController', ['$scope','$http', function($scope,$http) {
-	
+raspberryControllers.controller('ArtistsDetailController', ['$scope','$routeParams','Page', function($scope,$routeParams,Page) {
+	Page.setTitle("Artist Details");
+    $scope.albums = [];
+    console.log($routeParams.id);
+    mopidy.library.lookup($routeParams.id).done(function(data) { 
+        $scope.albums = data.map(function(track){
+            return track.album;
+        });
+        console.log($scope.albums);
+    });
 }]);
 
 raspberryControllers.controller('AlbumsController', ['$scope','Page', function($scope,Page) {
