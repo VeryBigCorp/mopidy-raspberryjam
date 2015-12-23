@@ -1,7 +1,7 @@
 <div class="col-xs-12">
 	<div class="row page-title">
 		<div class="col-xs-12 col-md-8">
-			<h4><i class="fa fa-users"></i> Artists</h4>
+			<h4><i class="fa fa-users"></i> Artists <span class="label label-info" ng-if="searchResults.total != null">{{searchResults.total}}</span></h4>
 		</div>
 		<div class="col-xs-12 col-md-4">
 			<form id="artist-search" ng-submit="searchArtists()">
@@ -30,4 +30,6 @@
 			</div>
 		</div>
 	</div>
+
+    <p ng-if="searchResults.total != null && searchResults.total == 0">No results</p>
 </div>

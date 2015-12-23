@@ -208,6 +208,7 @@ div.page-title {
 
 .player-albumart {
     padding-right:0px;
+    padding-left:0px;
 }
 
 .player-albumart > img {
@@ -419,7 +420,8 @@ p.description_content{
 .bg_blur{
     height: 200px;
     background-size: cover;
-padding: 20px;
+    padding: 20px;
+    width: 200px;
 }
 
 .artist-header{
@@ -460,5 +462,14 @@ padding: 20px;
     }
 }
 
+#artist-img {
+    //width:100%;
+}
 
+.album-img {
+    width:100%;
+}
 
+.album-row {
+    margin-bottom:20px;
+}

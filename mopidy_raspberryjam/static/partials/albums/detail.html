@@ -1,0 +1,39 @@
+<div class="col-xs-12">
+	<div class="artist-header row panel">
+        <div style="" class="col-xs-12 col-md-4 bg_blur ">
+            <img id="artist-img" style="margin-left:auto;margin-right:auto;" src="{{img || 'assets/cd.png'}}" class="img-responsive">
+    </div>
+        <div class="col-md-8  col-xs-12">
+           <div class="header">
+                <h1 ng-bind="artist.name"></h1>
+                <h4 ng-bind="(albums != null ? 'album'.pluralize(albums.length) : '')"></h4>
+                <h5 ng-bind=""></h5>
+            </div>
+        </div>
+    </div>
+    <div class="row album-row" ng-repeat="album in albums">
+        <div class="col-xs-12 col-md-2">
+            <img class="album-img" src="{{album.images[0]}}"/>
+            <h3>{{album.name}}</h3>
+            <button type="button" class="btn btn-default" aria-label="Add entire album to queue">
+              <i class="fa fa-plus-circle"></i> Add Album
+            </button>
+        </div>
+        <div class="col-xs-12 col-md-10">
+            <table class="table table-responsive table-hover">
+                <thead>
+                    <th></th>
+                    <th>Title</th>
+                    <th style="text-align:right;"><i class="fa fa-clock-o"></i></th>
+                </thead>
+                <tbody>
+                    <tr name="row_{{track.uri}}" ng-repeat="track in album.tracks">
+                        <td width="32px" style="text-align:center;"><a ng-click="addToQueue(track.uri)"><i class="fa fa-plus-circle"></i></a></td>
+                        <td>{{track.name}}</td>
+                        <td style="text-align:right">{{timeToStr(track.length/1000)}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

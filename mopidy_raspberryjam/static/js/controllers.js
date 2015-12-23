@@ -24,30 +24,42 @@ raspberryControllers.controller('QueueCtrl', function($scope,Page){
 	Page.setTitle("Queue");
 });
 
-raspberryControllers.controller('MainCtrl', function($scope,Page){
+raspberryControllers.controller('MainCtrl', function($scope,Page,mop){
 	$scope.Page = Page;
+    $scope.mop = mop;
 });
 
 raspberryControllers.controller('PlayingCtrl', function($scope,Page){
 	$scope.controllable = false;
 });
 
-raspberryControllers.controller('ArtistsController', ['$rootScope','$scope','Page', function($rootScope,$scope, Page) {
-	Page.setTitle("Artists");
-	$scope.columns = 4;
+raspberryControllers.controller('ArtistsController', ['$rootScope','$scope','Page','mop', function($rootScope,$scope, Page,mop) {
+    Page.setTitle("Artists");
+    $scope.columns = 4;
 	$scope.width = 12/$scope.columns;
 	$scope.searchResults = [];
 	$scope.searchArtists = function(){
 		var artist = this.artist_name;
-		setTimeout(function(){
+        Page.setTitle(artist);
+		mop.callbackReady(function(){
 			$("#search-icon").toggleClass("fa-pulse fa-spinner", true);
 			$("#search-icon").toggleClass("fa-search", false);
-			mopidy.library.search({"artist":artist}).done(function(data){
+			mop.searchLibrary({"artist":artist},function(data){
 				$scope.searchResults = $.extend(true,[],data);
-				for(var i = 0; i < $scope.searchResults.length; i ++) {
-					if($scope.searchResults[i].artists != null)
+                $scope.searchResults.total = 0;
+				for(var i = 0; i < $scope.searchResults.length; i++) {
+					if($scope.searchResults[i].artists != null){ 
+                        /*mopidy.library.getImages($scope.searchResults[i].artists.map(function(artist){return artist.uri;})).done(function(data){
+                            console.log(data);
+                            for(uri in data){
+                                $("img[name='albumart_"+uri+"']").attr('src', data[uri] != null && data[uri].length > 0 ? data[uri][0].uri : "assets/cd.png");
+                            }
+                        });*/
+
+                        $scope.searchResults.total += $scope.searchResults[i].artists.length;
 						$scope.searchResults[i].artists = $scope.searchResults[i].artists.slices($scope.columns);
-				}
+                    }
+                }
 
 				$scope.$apply();
 				for(var h = 0; h < data.length; h++){
@@ -73,7 +85,7 @@ raspberryControllers.controller('ArtistsController', ['$rootScope','$scope','Pag
 				$("#search-icon").toggleClass("fa-pulse fa-spinner", false);
 				$("#search-icon").toggleClass("fa-search", true);
 			});
-		},0);
+		});
 	};
 
 	$scope.getAlbumArt = function(results){
@@ -84,28 +96,100 @@ raspberryControllers.controller('ArtistsController', ['$rootScope','$scope','Pag
 	}
 }]);
 
-raspberryControllers.controller('ArtistsDetailController', ['$scope','$routeParams','Page', function($scope,$routeParams,Page) {
+raspberryControllers.controller('ArtistsDetailController', ['$scope','$routeParams','Page', 'mop', function($scope,$routeParams,Page,mop) {
 	Page.setTitle("Artist Details");
-    $scope.albums = [];
-    console.log($routeParams.id);
-    mopidy.library.lookup($routeParams.id).done(function(data) { 
-        $scope.albums = data.map(function(track){
-            return track.album;
+    $scope.id = $routeParams.id;
+    $scope.artist = {name: "Loading..."};
+    // Get artist image
+
+    mop.callbackReady(function(){
+        // Get artist image
+        mop.service.library.getImages([$scope.id]).done(function(data){
+            if(data[$scope.id].length > 0)
+                $scope.img = data[$scope.id].rand().uri;
+            $scope.$apply();
         });
-        console.log($scope.albums);
+
+        // Get tracks
+        mop.lookup($scope.id,function(_tracks) { 
+            var tracks = $.extend(true,[],_tracks);
+            $scope.albums = tracks.map(function(track){
+                return track.album;    
+            });
+            $scope.albums = $scope.albums.uniq("uri").sort_key("name");
+            console.log($scope.albums);
+            // Get artist name lol
+            for(var i = 0; i < $scope.albums.length; i++){
+                for(var j = 0; j < $scope.albums[i].artists.length;j++){
+                    if($scope.albums[i].artists[j].uri == $scope.id){
+                        $scope.artist = $scope.albums[i].artists[j];
+                        Page.setTitle($scope.artist.name);
+                        i = $scope.albums.length;   // break out of outer loop
+                        break;
+                    }
+                }
+            }
+            
+            // Add tracks to each album
+            for(var i = 0; i < $scope.albums.length; i++){
+                for(var j = 0; j < tracks.length; j++){
+                    if(tracks[j].album.uri == $scope.albums[i].uri){
+                        if($scope.albums[i].tracks == null)
+                            $scope.albums[i].tracks = [];
+                        $scope.albums[i].tracks.push(tracks[j]);
+                    }
+                }
+            }
+            $scope.$apply();
+        });
     });
+
+
+	$scope.timeToStr = function(seconds){
+		var str = "";
+		var hrs = Math.floor(seconds / 3600);
+		var mins = Math.floor((seconds - hrs*3600)/ 60);
+		var secs = Math.floor((seconds-hrs*3600-mins*60));
+        var time = [hrs,mins,secs];
+
+        for(var i = 0; i < 3; i++){
+            if(i == 0 && time[i] == 0){
+                time.splice(i,1);
+                continue;
+            }
+            if(time[i] < 10){
+                time[i] = "0"+time[i];
+            }
+        }
+
+        return time.join(":");
+        return str + (hrs > 0 ? hrs+ "jquery "  : "") + (mins > 0 ? mins + " min " : "") + (secs > 0 ? secs + " s" : "");
+	}
+
+    $scope.addToQueue = function(uri){
+        mop.addToQueue(uri);
+    }
 }]);
 
-raspberryControllers.controller('AlbumsController', ['$scope','Page', function($scope,Page) {
+raspberryControllers.controller('AlbumsController', ['$scope','Page','mop', function($scope,Page,mop) {
 	Page.setTitle("Albums");
-	$scope.searchResults = [];
+    $scope.columns = 4;
+	$scope.width = 12/$scope.columns;
+    $scope.searchResults = [];
 	$scope.searchAlbums = function(){
 		var album = this.album_name;
+        Page.setTitle(album);
 		setTimeout(function(){
 			$("#search-icon").toggleClass("fa-pulse fa-spinner", true);
 			$("#search-icon").toggleClass("fa-search", false);
-			mopidy.library.search({"album":album}).done(function(data){
-				$scope.searchResults = data[0];
+			mop.service.library.search({"album":album}).done(function(data){
+				$scope.searchResults = $.extend(true,[],data);
+
+                for(var i = 0; i < $scope.searchResults.length; i++){
+                    if($scope.searchResults[i].albums)
+                        $scope.searchResults[i].albums = $scope.searchResults[i].albums.slices($scope.columns).uniq().sort_key("name");
+                }
+
 				$scope.$apply();
 
 				$("#search-icon").toggleClass("fa-pulse fa-spinner", false);
@@ -113,4 +197,20 @@ raspberryControllers.controller('AlbumsController', ['$scope','Page', function($
 			});
 		},0);
 	};
+}]);
+
+raspberryControllers.controller('AlbumsDetailController',['$scope','$routeParams','Page','mop', function($scope,$routeParams,Page,mop){
+    Page.setTitle("Album");
+    $scope.id = $routeParams.id;
+    $scope.album = [];
+    mop.callbackReady(function(){
+        console.log($scope.id);
+        mop.service.library.lookup($scope.id).done(function(data){
+            console.log(data);
+        });
+    });
+}]);
+
+raspberryControllers.controller('SettingsController', ['$scope','Page', function($scope,Page) {
+    Page.setTitle("Settings");
 }]);

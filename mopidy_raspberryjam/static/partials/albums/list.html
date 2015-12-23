@@ -15,9 +15,11 @@
 		</div>
 	</div>
 	<hr class="page-title"/>
-	<div ng-repeat="album in searchResults.albums track by $index" class="card">
+    <div ng-repeat="source in searchResults">
+        <div ng-repeat="slice in source.albums" class="row">
+	<div ng-repeat="album in slice track by $index" class="col-xs-12 col-md-{{width}} card">
 		<div class="card-image">
-		    <img class="img-responsive" name="albumart_{{artist.uri}}" src="{{getAlbumArt(artist.uri)}}"/>
+		    <img class="img-responsive" name="albumart_{{artist.uri}}" src="{{album.images.length > 0 ? album.images[0] : 'assets/cd.png'}}"/>
 		</div><!-- card image -->
 
 		<div class="card-content">
@@ -32,5 +34,7 @@
 		<div class="card-action">
 		  
 		</div>
+        </div>
+        </div>
 	</div>
 </div>

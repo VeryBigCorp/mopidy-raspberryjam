@@ -26,7 +26,7 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
-                    <a href="#">
+                    <a href="#/">
                         <img class="brand-logo" src="./assets/rpi_logo.png"/> <i style="display:inline;" class="fa fa-music"></i>aspberry Jam
                     </a>
                 </li>
@@ -40,33 +40,33 @@
                     <a href="#/artists"><i class="fa fa-users sidebar-img"></i> Artists</a>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-music sidebar-img"></i> Songs</a>
+                    <a href="#/songs"><i class="fa fa-music sidebar-img"></i> Songs</a>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-spotify sidebar-img"></i> Spotify</a>
+                    <a href="#/spotify"><i class="fa fa-spotify sidebar-img"></i> Spotify</a>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-youtube-play sidebar-img"></i> YouTube</a>
+                    <a href="#/youtube"><i class="fa fa-youtube-play sidebar-img"></i> YouTube</a>
                 </li>
 
                 <li>
-                    <a href="#"><i class="fa fa-microphone sidebar-img"></i> Radio/Stream</a>
+                    <a href="#/radio"><i class="fa fa-microphone sidebar-img"></i> Radio/Stream</a>
                 </li>
 		<li>
-                    <a href="#"><i class="fa fa-gears sidebar-img"></i> Settings</a>
+                    <a href="#/settings"><i class="fa fa-gears sidebar-img"></i> Settings</a>
                 </li>
             </ul>
         </div>
 
         <div class="page-content-wrapper">
           <div class="container-fluid">
-			<div class="row">
-			  <div class="player"  id="player" ng-controller="PlayingCtrl">
+          <div class="row">
+			  <div class="player col-xs-12" id="player" ng-controller="PlayingCtrl">
 				<div class="hidden-md hidden-lg" ng-include="'./partials/now_playing_mobile.html'"></div>
 				<div class="hidden-xs hidden-sm" ng-include="'./partials/now_playing.html'"></div>
 			  </div>
             	<div ng-view></div>
-			</div>
+                </div>
           </div>
         </div>
       </div>
