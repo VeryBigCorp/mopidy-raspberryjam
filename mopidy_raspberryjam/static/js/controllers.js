@@ -117,29 +117,28 @@ raspberryControllers.controller('ArtistsDetailController', ['$scope','$routePara
                 return track.album;    
             });
             $scope.albums = $scope.albums.uniq("uri").sort_key("name");
-            console.log($scope.albums);
             // Get artist name lol
             for(var i = 0; i < $scope.albums.length; i++){
+                // Get artist name
                 for(var j = 0; j < $scope.albums[i].artists.length;j++){
                     if($scope.albums[i].artists[j].uri == $scope.id){
                         $scope.artist = $scope.albums[i].artists[j];
                         Page.setTitle($scope.artist.name);
-                        i = $scope.albums.length;   // break out of outer loop
                         break;
                     }
                 }
-            }
-            
-            // Add tracks to each album
-            for(var i = 0; i < $scope.albums.length; i++){
+                // Add tracks to each album
+                $scope.albums[i].runTime = 0;
                 for(var j = 0; j < tracks.length; j++){
                     if(tracks[j].album.uri == $scope.albums[i].uri){
                         if($scope.albums[i].tracks == null)
                             $scope.albums[i].tracks = [];
                         $scope.albums[i].tracks.push(tracks[j]);
+                        $scope.albums[i].runTime += tracks[i].length;
                     }
                 }
             }
+            $scope.nTracks = tracks.length;
             $scope.$apply();
         });
     });
@@ -184,12 +183,26 @@ raspberryControllers.controller('AlbumsController', ['$scope','Page','mop', func
 			$("#search-icon").toggleClass("fa-search", false);
 			mop.service.library.search({"album":album}).done(function(data){
 				$scope.searchResults = $.extend(true,[],data);
+                console.log(data);
+                // Get tracks
+                for(var h = 0; h < data.length; h++){
+                    if(data[h].albums != null){
+                        for(var i = 0; i < data[h].albums.length; i++){
+                            $scope.searchResults[h].albums[i].nTracks = 0;
+                            if(data[h].tracks != null){
+                                for(var j = 0; j < data[h].tracks.length; j++){
+                                   if(data[h].tracks[j].album.uri == data[h].albums[i].uri)
+                                        $scope.searchResults[h].albums[i].nTracks++;
+                                }
+                            }
+                        }
+                    }
+                }
 
                 for(var i = 0; i < $scope.searchResults.length; i++){
                     if($scope.searchResults[i].albums)
-                        $scope.searchResults[i].albums = $scope.searchResults[i].albums.slices($scope.columns).uniq().sort_key("name");
+                        $scope.searchResults[i].albums = $scope.searchResults[i].albums.uniq("uri").sort_key("name").slices($scope.columns);
                 }
-
 				$scope.$apply();
 
 				$("#search-icon").toggleClass("fa-pulse fa-spinner", false);

@@ -17,24 +17,28 @@
 	<hr class="page-title"/>
     <div ng-repeat="source in searchResults">
         <div ng-repeat="slice in source.albums" class="row">
-	<div ng-repeat="album in slice track by $index" class="col-xs-12 col-md-{{width}} card">
-		<div class="card-image">
-		    <img class="img-responsive" name="albumart_{{artist.uri}}" src="{{album.images.length > 0 ? album.images[0] : 'assets/cd.png'}}"/>
-		</div><!-- card image -->
+        	<div ng-repeat="album in slice track by $index" class="col-xs-12 col-md-{{width}} card">
+                <div class="card-image">
+                    <img class="img-responsive" name="albumart_{{artist.uri}}" src="{{album.images.length > 0 ? album.images[0] : 'assets/cd.png'}}"/>
+                </div><!-- card image -->
 
-		<div class="card-content">
-		    <span class="card-title"><a href="#/albums/{{album.uri}}">{{album.name}}</a></span><br/>
-		    <span style="font-style:italic;" class="card-subtitle">{{album.artists[0].name}}</span><br/>
-		    <span class="card-subtitle"></span><br/>
-			  <div class="row">
-		      <div class="col-xs-6"><span name="player-genre" class="card-subtitle"></span></div>
-		      <div class="col-xs-6"><span name="player-length" class="card-subsubtitle"></span></div>
-			  </div>
-		</div><!-- card content -->
-		<div class="card-action">
-		  
-		</div>
-        </div>
+                <div class="card-content">
+                    <span class="card-title"><a href="#/albums/{{album.uri}}">{{album.name}}</a></span><br/>
+                    <span style="font-style:italic;" class="card-subtitle">
+                        <span ng-repeat="artist in album.artists">
+                            <a href="#/artists/{{artist.uri}}" ng-bind="artist.name"></a>
+                        </span>
+                    </span><br/>
+                    <span class="card-subtitle"></span><br/>
+                      <div class="row">
+                      <div class="col-xs-6"><span name="player-genre" class="card-subtitle" ng-bind="'track'.pluralize(album.nTracks)"></span></div>
+                      <div class="col-xs-6"><span name="player-length" class="card-subsubtitle"></span></div>
+                      </div>
+                </div><!-- card content -->
+                <div class="card-action">
+                  
+                </div>
+            </div>
         </div>
 	</div>
 </div>

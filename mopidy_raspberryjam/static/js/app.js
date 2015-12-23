@@ -86,12 +86,10 @@ function searchCache(cache, params){
                     // Get tracks
                     for(var i = 0; i < cache.tracks.length; i++){
                         if(cache.tracks[i].artists != null){
-                            var hit = cache.tracks[i].artists.search("uri", params.uri) !== -1 || cache.tracks[i].album.artists.search("uri", params.uri) !== -1;
-                            if(hit)
+                            if(cache.tracks[i].artists.search("uri", params.uri) !== -1 || cache.tracks[i].album.artists.search("uri", params.uri) !== -1)
                                 tmp.push(cache.tracks[i]);
                         }
                     }
-                    console.log(tmp);
                 }
            }
        } else if(params.uri.indexOf("track") !== -1){
@@ -236,7 +234,6 @@ raspberryjamApp.factory('mop', function(){
             });
         },
         lookup: function(uri, done){           // Lookup uses cache (for detail pages)
-            console.log(cache);
             var res = searchCache(cache, {"uri": uri});
             if(res !== -1){
                 // Get just tracks
@@ -246,7 +243,6 @@ raspberryjamApp.factory('mop', function(){
                             return track;
                     }
                 });*/
-                console.log(res);
                 done(res);
             } else {
                 mopidy.library.lookup(uri).done(function(data){done(data);});
