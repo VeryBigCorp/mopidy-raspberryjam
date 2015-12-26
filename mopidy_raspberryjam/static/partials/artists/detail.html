@@ -32,7 +32,7 @@
                     <tr name="row_{{track.uri}}" ng-repeat="track in album.tracks">
                         <td width="32px" style="text-align:center;"><a ng-click="addToQueue(track.uri)"><i class="fa fa-plus-circle"></i></a></td>
                         <td>{{track.name}}</td>
-                        <td style="text-align:right">{{timeToStr(track.length/1000)}}</td>
+                        <td style="text-align:right" ng-bind="timeToStr(track.length/1000)"></td>
                     </tr>
                 </tbody>
             </table>

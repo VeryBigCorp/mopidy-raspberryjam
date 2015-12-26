@@ -96,8 +96,17 @@ function searchCache(cache, params){
            if(cache.tracks != null)
                 tmp = cache.tracks.search("uri", params.uri);
        } else if(params.uri.indexOf("album") !== -1){
-           if(cache.albums != null)
+           if(cache.albums != null){
                 tmp = cache.albums.search("uri", params.uri);
+                if(tmp != -1){
+                    tmp = [];
+                    for(var i = 0; i < cache.tracks.length; i++){
+                        if(cache.tracks[i].album != null && cache.tracks[i].album.uri == params.uri)
+                            tmp.push(cache.tracks[i]);
+                    }
+                }
+                console.log(tmp);
+           }
        }
     } else {
     
@@ -178,6 +187,10 @@ raspberryjamApp.config(['$routeProvider','$locationProvider',
             when('/albums/:id', {
                 templateUrl: 'partials/albums/detail.html',
                 controller: 'AlbumsDetailController'
+            }).
+            when('/songs', {
+                templateUrl: 'partials/songs/list.html',
+                controller: 'SongsController'
             }).
             when('/settings', {
                 templateUrl: 'partials/settings.html',

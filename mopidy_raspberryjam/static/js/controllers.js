@@ -181,7 +181,7 @@ raspberryControllers.controller('AlbumsController', ['$scope','Page','mop', func
 		setTimeout(function(){
 			$("#search-icon").toggleClass("fa-pulse fa-spinner", true);
 			$("#search-icon").toggleClass("fa-search", false);
-			mop.service.library.search({"album":album}).done(function(data){
+			mop.searchLibrary({"album":album}, function(data){
 				$scope.searchResults = $.extend(true,[],data);
                 console.log(data);
                 // Get tracks
@@ -198,10 +198,13 @@ raspberryControllers.controller('AlbumsController', ['$scope','Page','mop', func
                         }
                     }
                 }
-
+                $scope.searchResults.total = 0;
                 for(var i = 0; i < $scope.searchResults.length; i++){
-                    if($scope.searchResults[i].albums)
-                        $scope.searchResults[i].albums = $scope.searchResults[i].albums.uniq("uri").sort_key("name").slices($scope.columns);
+                    if($scope.searchResults[i].albums){
+                        $scope.searchResults[i].albums = $scope.searchResults[i].albums.uniq("uri").sort_key("name");
+                        $scope.searchResults.total += $scope.searchResults[i].albums.length;
+                        $scope.searchResults[i].albums = $scope.searchResults[i].albums.slices($scope.columns);
+                    }
                 }
 				$scope.$apply();
 
@@ -215,13 +218,97 @@ raspberryControllers.controller('AlbumsController', ['$scope','Page','mop', func
 raspberryControllers.controller('AlbumsDetailController',['$scope','$routeParams','Page','mop', function($scope,$routeParams,Page,mop){
     Page.setTitle("Album");
     $scope.id = $routeParams.id;
-    $scope.album = [];
+    $scope.album = {};
     mop.callbackReady(function(){
         console.log($scope.id);
-        mop.service.library.lookup($scope.id).done(function(data){
-            console.log(data);
+        mop.lookup($scope.id, function(tracks){
+            if(tracks.length > 0)
+                $scope.album = tracks[0].album;
+            $scope.album.tracks = tracks;
+            $scope.$apply();
+            console.log($scope.album);
         });
     });
+
+	$scope.timeToStr = function(seconds){
+		var str = "";
+		var hrs = Math.floor(seconds / 3600);
+		var mins = Math.floor((seconds - hrs*3600)/ 60);
+		var secs = Math.floor((seconds-hrs*3600-mins*60));
+        var time = [hrs,mins,secs];
+
+        for(var i = 0; i < 3; i++){
+            if(i == 0 && time[i] == 0){
+                time.splice(i,1);
+                continue;
+            }
+            if(time[i] < 10){
+                time[i] = "0"+time[i];
+            }
+        }
+
+        return time.join(":");
+        return str + (hrs > 0 ? hrs+ "jquery "  : "") + (mins > 0 ? mins + " min " : "") + (secs > 0 ? secs + " s" : "");
+	}
+}]);
+
+raspberryControllers.controller('SongsController',['$scope','Page','mop','$sce', function($scope, Page, mop,$sce){
+    Page.setTitle("Songs");
+    $scope.searchSongs = function(){
+        var track = this.track_name;
+        Page.setTitle(track);
+        mop.callbackReady(function(){
+            setTimeout(function(){
+                $("#search-icon").toggleClass("fa-pulse fa-spinner", true);
+                $("#search-icon").toggleClass("fa-search", false);
+                mop.searchLibrary({track_name:track},function(data){
+                    console.log(data);
+
+                    $scope.searchResults = [];
+
+                    for(var i = 0; i < data.length; i++){
+                        if(data[i].tracks != null){
+                            $scope.searchResults = $scope.searchResults.concat(data[i].tracks);
+                        }
+                    }
+
+                    console.log($scope.searchResults);
+                    $scope.$apply();
+                    $("#search-icon").toggleClass("fa-pulse fa-spinner", false);
+                    $("#search-icon").toggleClass("fa-search", true);
+                });
+            }, 0);
+        });
+    }
+
+    $scope.getArtistNames = function(track){
+        return $sce.trustAsHtml(track.artists.map(function(artist){
+                return "<a href='#/artists/"+artist.uri+"'>"+artist.name+"</a>";
+        }).join(','));
+    };
+
+	$scope.timeToStr = function(seconds){
+		var str = "";
+		var hrs = Math.floor(seconds / 3600);
+		var mins = Math.floor((seconds - hrs*3600)/ 60);
+		var secs = Math.floor((seconds-hrs*3600-mins*60));
+        var time = [hrs,mins,secs];
+
+        for(var i = 0; i < 3; i++){
+            if(i == 0 && time[i] == 0){
+                time.splice(i,1);
+                continue;
+            }
+            if(time[i] < 10){
+                time[i] = "0"+time[i];
+            }
+        }
+
+        return time.join(":");
+        return str + (hrs > 0 ? hrs+ "jquery "  : "") + (mins > 0 ? mins + " min " : "") + (secs > 0 ? secs + " s" : "");
+	}
+
+    $scope.addToQueue = mop.addToQueue;
 }]);
 
 raspberryControllers.controller('SettingsController', ['$scope','Page', function($scope,Page) {
