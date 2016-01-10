@@ -46,11 +46,44 @@ Array.prototype.sort_key = function(key){
 
 Array.prototype.search = function(key,query){
     for(var i = 0; i < this.length; i++){
-        if(this[i][key] == query)
-            return this[i][key];
+        if(this[i][key] == query || (typeof query == "string" && this[i][key].indexOf(query) !== -1))
+            return this[i];
     }
     return -1;
 }
+
+Array.prototype.search_all = function(key, query, lower){
+    var ret = [];
+    lower = lower || false;
+    for(var i = 0; i < this.length; i++){
+        if(this[i][key] == query || (typeof query == "string" && (lower ? this[i][key].toLowerCase() : this[i][key]).indexOf(query) !== -1))
+            ret.push(this[i]);
+    }
+    return ret;
+}
+
+// Group object array by key
+Array.prototype.group_by = function(key){
+    var ret = [];
+    var cop = this;
+    for(var i = 0; i < cop.length; i++){
+        if(cop[i][key] == null) continue;
+
+        var val = cop[i][key];
+        var arr = [cop[i]];
+        for(var j = i+1; j < cop.length; j++){
+            if(cop[j][key] == val){
+                arr.push(cop[j]);
+                cop.splice(j,1);
+                j--;
+            }
+        }
+        cop.splice(i,1);
+        i--;
+        ret.push(arr);
+    }
+    return ret;
+};
 
 String.prototype.pluralize = function(num,plural){
     plural = plural || this + "s";
@@ -59,12 +92,30 @@ String.prototype.pluralize = function(num,plural){
     return num + " " + this;
 }
 
-// (in-place) Merge fields in this object with those in obj (uniquely)
+String.prototype.limit = function(len){
+    if(this.length > len)
+        return this.substring(0,len-3) + "...";
+    return this.substr(0,this.length);
+}
+
+if (!String.prototype.format) {
+      String.prototype.format = function() {
+              var args = arguments;
+                  return this.replace(/{(\d+)}/g, function(match, number) { 
+                                return typeof args[number] != 'undefined'
+                                        ? args[number]
+                                                : match
+                                                      ;
+                                                          });
+                    };
+}
+
+// (in-place) Merge fields in this object with those in obj (uniquely by key)
 function merge(objA,objB,key){
     for(var prop in objB){
         if(objA[prop] != null){
             if(Array.isArray(objA[prop]))
-                objA[prop] = (objA[prop].concat(objB[prop])).uniq("uri");
+                objA[prop] = (objA[prop].concat(objB[prop])).uniq(key);
             else
                 objA[prop] = objB[prop];
         } else {
@@ -160,6 +211,16 @@ function stripIDFromURI(uri){
   return uri;
 }
 
+function backendNameFromURI(uri){
+    if(uri.indexOf("spotify") !== -1)
+        return "spotify";
+    else if(uri.indexOf("gmusic") !== -1)
+        return "gmusic";
+    else if(uri.indexOf("soundcloud") !== -1)
+        return "soundcloud";
+    return -1;
+}
+
 var raspberryjamApp = angular.module("raspberryjamApp", [
   'ngRoute',
   'raspberryjamControllers'
@@ -192,6 +253,18 @@ raspberryjamApp.config(['$routeProvider','$locationProvider',
                 templateUrl: 'partials/songs/list.html',
                 controller: 'SongsController'
             }).
+            when('/playlists', {
+                templateUrl: 'partials/playlists/list.html',
+                controller: 'PlaylistsController'
+            }).
+            when('/gmusic', {
+                templateUrl: 'partials/gmusic/index.html',
+                controller: 'GMusicController'
+            }).
+            when('/history', {
+                templateUrl: 'partials/history.html',
+                controller: 'HistoryController'
+            }).
             when('/settings', {
                 templateUrl: 'partials/settings.html',
                 controller: 'SettingsController'
@@ -209,14 +282,30 @@ raspberryjamApp.factory('Page', function(){
   };
 });
 
-raspberryjamApp.factory('mop', function(){
+
+raspberryjamApp.factory('Persistence', function(){
+});
+
+raspberryjamApp.factory('mop', function($rootScope){
     var mopidy = new Mopidy();
     mopidy.on("event:playbackStateChanged", function () {
         populatePlayer(mopidy);
     });
 
+    var backends = [];          // List of backends (such as GMusic, Spotify, etc)
     mopidy.on("state:online", function () {
         populatePlayer(mopidy);
+        // Do quick query to find all the backends (hopefully 846c2ae7ead08d917725e1b623706446) doesn't actually exist
+        mopidy.library.search({track_name: "846c2ae7ead08d917725e1b623706446"}).done(function(data){
+            var tmp = "";
+            for(var i = 0; i < data.length; i++){
+                tmp = backendNameFromURI(data[i].uri);
+                if(tmp != -1)
+                    backends.push(tmp);
+            }
+            $rootScope.backends = backends;
+            $rootScope.$apply();
+        });
     });
 
     //mopidy.on(console.log.bind(console));
@@ -226,20 +315,21 @@ raspberryjamApp.factory('mop', function(){
 
     return {
         service: mopidy,
+        backends: backends,
         callbackReady: function(callback){
             var check = setInterval(function(){
                 if(mopidy.library != null){
                     clearInterval(check);
                     callback();
                 }
-            },0,25);
+            },0,16);
         },
-        searchLibrary: function(params, done){
-            mopidy.library.search(params).done(function(data){
+        searchLibrary: function(params, done, uris){
+            mopidy.library.search(params, uris=(uris || [])).done(function(data){
                 // Merge new data into cache
 
                 for(var i = 0; i < data.length; i++){
-                    merge(cache,data[i]);
+                    merge(cache,data[i],"uri");
                     //structureCache(cache);
                 }
                 //console.log(cache);

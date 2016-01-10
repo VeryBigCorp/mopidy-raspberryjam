@@ -40,7 +40,7 @@ raspberryControllers.controller('ArtistsController', ['$rootScope','$scope','Pag
 	$scope.searchResults = [];
 	$scope.searchArtists = function(){
 		var artist = this.artist_name;
-        Page.setTitle(artist);
+        Page.setTitle(artist + " | Artists");
 		mop.callbackReady(function(){
 			$("#search-icon").toggleClass("fa-pulse fa-spinner", true);
 			$("#search-icon").toggleClass("fa-search", false);
@@ -162,7 +162,6 @@ raspberryControllers.controller('ArtistsDetailController', ['$scope','$routePara
         }
 
         return time.join(":");
-        return str + (hrs > 0 ? hrs+ "jquery "  : "") + (mins > 0 ? mins + " min " : "") + (secs > 0 ? secs + " s" : "");
 	}
 
     $scope.addToQueue = function(uri){
@@ -215,7 +214,7 @@ raspberryControllers.controller('AlbumsController', ['$scope','Page','mop', func
 	};
 }]);
 
-raspberryControllers.controller('AlbumsDetailController',['$scope','$routeParams','Page','mop', function($scope,$routeParams,Page,mop){
+raspberryControllers.controller('AlbumsDetailController',['$scope','$routeParams','Page','mop','$sce', function($scope,$routeParams,Page,mop,$sce){
     Page.setTitle("Album");
     $scope.id = $routeParams.id;
     $scope.album = {};
@@ -229,6 +228,13 @@ raspberryControllers.controller('AlbumsDetailController',['$scope','$routeParams
             console.log($scope.album);
         });
     });
+
+    $scope.getArtistNames = function(album){
+        if(album.artists == null) return;
+        return $sce.trustAsHtml(album.artists.map(function(artist){
+                return "<a class='uriLink' href='#/artists/"+artist.uri+"'>"+artist.name+"</a>";
+        }).join(','));
+    };
 
 	$scope.timeToStr = function(seconds){
 		var str = "";
@@ -283,7 +289,7 @@ raspberryControllers.controller('SongsController',['$scope','Page','mop','$sce',
 
     $scope.getArtistNames = function(track){
         return $sce.trustAsHtml(track.artists.map(function(artist){
-                return "<a href='#/artists/"+artist.uri+"'>"+artist.name+"</a>";
+                return "<a class='uriLink' href='#/artists/"+artist.uri+"'>"+artist.name+"</a>";
         }).join(','));
     };
 
@@ -311,6 +317,270 @@ raspberryControllers.controller('SongsController',['$scope','Page','mop','$sce',
     $scope.addToQueue = mop.addToQueue;
 }]);
 
-raspberryControllers.controller('SettingsController', ['$scope','Page', function($scope,Page) {
+raspberryControllers.controller('PlaylistsController',['$scope','Page','mop','$sce', function($scope, Page, mop, $sce){
+    Page.setTitle("Playlists");
+
+    $scope.search = function(){
+        var query = this.query;
+        Page.setTitle(query + " - Playlists");
+
+        setTimeout(function(){
+            $("#search-icon").toggleClass("fa-pulse fa-spinner", true);
+            $("#search-icon").toggleClass("fa-search", false);
+            mop.callbackReady(function(){
+                mop.service.playlists.getPlaylists().done(function(data){
+                    data = data.search_all("name", query, true);
+                    for(var i = 0; i < data.length; i++){
+                        if(data[i].tracks != null)
+                            data[i].runTime = data[i].tracks.reduce(function(a, b){ return {length: a.length + b.length} }).length;
+                    }
+
+                    $scope.searchResults = data;
+                    console.log($scope.searchResults);
+                    var func = function(idx){
+                        var canvas = document.getElementById("playlist_"+data[idx].uri);
+                        var context = canvas.getContext("2d");
+                        var album_slices = data[idx].tracks.map(function(track){ return track.album; }).uniq("uri").slice(0,4).slices(2);
+                        
+                        // Draw album art column-wise
+                        for(var j = 0; j < album_slices.length; j++){
+                            var slice = album_slices[j]; // TODO: Get unique images
+                            console.log(slice);
+                            for(var k = 0; k < slice.length; k++){
+                                var img = new Image();
+                                img.onload = function(){
+                                    console.log("liaded " + img.src);
+                                    console.log("dimensions: ({0}, {1}, {2}, {3})".format(j*canvas.width/album_slices.length, k*canvas.height/slice.length, canvas.width/album_slices.length, canvas.height/slice.length));
+                                    context.drawImage(img, 0,0);//j*canvas.width/album_slices.length, k*canvas.height/slice.length, canvas.width/album_slices.length, canvas.height/slice.length);
+                                };
+
+                                img.src = slice[k].images != null && slice[k].images.length > 0 ? slice[k].images[0] : "assets/cd.png";
+                            }
+                        }
+                    };
+
+                    $scope.$apply();
+
+                    var idx = 0; 
+                    for(;idx < data.length; idx++){
+                        setTimeout(func(idx), 10);
+                    }
+                    $("#search-icon").toggleClass("fa-pulse fa-spinner", false);
+                    $("#search-icon").toggleClass("fa-search", true);
+                });
+            });
+        }, 0);
+    };
+    
+	$scope.timeToStr = function(seconds){
+		var str = "";
+		var hrs = Math.floor(seconds / 3600);
+		var mins = Math.floor((seconds - hrs*3600)/ 60);
+		var secs = Math.floor((seconds-hrs*3600-mins*60));
+        var time = [hrs,mins,secs];
+
+        for(var i = 0; i < 3; i++){
+            if(i == 0 && time[i] == 0){
+                time.splice(i,1);
+                continue;
+            }
+            if(time[i] < 10){
+                time[i] = "0"+time[i];
+            }
+        }
+
+        return time.join(":");
+	}
+
+
+    $scope.getArtistNames = function(track){
+        return $sce.trustAsHtml(track.artists.map(function(artist){
+                return "<a class='uriLink' href='#/artists/"+artist.uri+"'>"+artist.name+"</a>";
+        }).join(','));
+    };
+
+    $scope.addToQueue = mop.addToQueue;
+}]);
+
+raspberryControllers.controller('GMusicController',['$scope','Page','mop','$sce', function($scope, Page, mop,$sce){
+    Page.setTitle("Google Music");
+    $scope.columns = 6;
+    $scope.width = 12/$scope.columns;
+    $scope.search = function(){
+        var query = this.query;
+        Page.setTitle(query + " - Google Music");
+        setTimeout(function(){
+            $("#search-icon").toggleClass("fa-pulse fa-spinner", true);
+            $("#search-icon").toggleClass("fa-search", false);
+            mop.callbackReady(function(){
+                mop.searchLibrary({any: query}, function(data){
+                    data = data[0];
+
+                    if(data.albums != null){
+                        for(var i = 0; i < data.albums.length; i++){
+                            data.albums[i].nTracks = 0;
+                            for(var j = 0; j < data.tracks.length; j++){
+                                if(data.tracks[j].album.uri == data.albums[i].uri)
+                                    data.albums[i].nTracks++;
+                            }
+
+                        }
+                        
+                    }
+                    
+                    if(data.artists != null){
+                        for(var i = 0; i < data.artists.length; i++){
+                            for(var j = 0; j < data.albums.length; j++){
+                                if(data.albums[j].artists.search("uri", data.artists[i].uri) !== -1){
+                                    data.artists[i].image = data.albums[j].images != null ? data.albums[j].images.rand() : "assets/cd.png";
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                    data.results = false;
+                    if(data.albums != null){
+                        data.results = true;
+                        data.albums = data.albums.slices($scope.columns);
+                    }
+                    if(data.artists != null){
+                        data.results = true;
+                        data.artists = data.artists.slices($scope.columns);
+                    }
+                    if(data.tracks != null)
+                        data.results = true;
+                    $scope.searchResults = data;
+                    console.log($scope.searchResults);
+                    $scope.$apply();
+                    $("#search-icon").toggleClass("fa-pulse fa-spinner", false);
+                    $("#search-icon").toggleClass("fa-search", true);
+                }, uris=['gmusic:']);
+            });
+        }, 0);
+    };
+
+    $scope.getArtistNames = function(track){
+        return $sce.trustAsHtml(track.artists.map(function(artist){
+                return "<a class='uriLink' href='#/artists/"+artist.uri+"'>"+artist.name+"</a>";
+        }).join(','));
+    };
+
+	$scope.timeToStr = function(seconds){
+		var str = "";
+		var hrs = Math.floor(seconds / 3600);
+		var mins = Math.floor((seconds - hrs*3600)/ 60);
+		var secs = Math.floor((seconds-hrs*3600-mins*60));
+        var time = [hrs,mins,secs];
+
+        for(var i = 0; i < 3; i++){
+            if(i == 0 && time[i] == 0){
+                time.splice(i,1);
+                continue;
+            }
+            if(time[i] < 10){
+                time[i] = "0"+time[i];
+            }
+        }
+
+        return time.join(":");
+	}
+
+    $scope.addToQueue = mop.addToQueue;
+}]);
+
+raspberryControllers.controller('HistoryController', ['$scope','Page','mop','$sce', function($scope, Page, mop, $sce){
+    mop.callbackReady(function(){
+        mop.service.history.getHistory().done(function(history){
+            mop.service.library.lookup(null, history.map(function(ref){return ref[1].uri})).done(function(tracks){
+                for(var i = 0; i < history.length; i++){
+                    var date = new Date(history[i][0]);
+                    history[i] = {
+                        timeStamp: date.getTime(),
+                        day: date.getDate(),
+                        month: date.getMonth(),
+                        year: date.getYear() + 1900,                // because yeah
+                        track: tracks[history[i][1].uri] != null ? tracks[history[i][1].uri][0] : history[i][1]
+                    };
+                }
+
+                $scope.results = history.length;
+                var today = new Date();
+                $scope.history = history.group_by("year").map(function(yr){
+                    return {
+                        year: yr[0].year == today.getYear() + 1900 ? "This Year" : yr[0].year,
+                        nItems: yr.length,
+                        months: yr.group_by("month").map(function(month){
+                            return {
+                                month: month[0].month,
+                                items: month.sort_key("time")
+                            }
+                        })
+                    }
+                });
+                
+                $scope.$apply();
+            });
+            
+        });
+    });
+
+    $scope.dateFormat = function(timestamp){
+        var date = new Date(timestamp);
+        var time = [date.getHours(), date.getMinutes()];
+
+        for(var i = 0; i < time.length; i++){
+            if(i == 0 && time[i] == 0){
+                time.splice(i,1);
+                continue;
+            }
+            if(time[i] < 10){
+                time[i] = "0"+time[i];
+            }
+        }
+
+        return time.join(":");
+    };
+
+    $scope.monthName = function(num){
+        return ["January", "February", "March", "April", "May", "June", "July", "August", "October", "September", "November", "December"][num];
+    };
+
+
+    $scope.getArtistNames = function(track){
+        return $sce.trustAsHtml(track.artists.map(function(artist){
+                return "<a class='uriLink' href='#/artists/"+artist.uri+"'>"+artist.name+"</a>";
+        }).join(','));
+    };
+
+	$scope.timeToStr = function(seconds){
+		var str = "";
+		var hrs = Math.floor(seconds / 3600);
+		var mins = Math.floor((seconds - hrs*3600)/ 60);
+		var secs = Math.floor((seconds-hrs*3600-mins*60));
+        var time = [hrs,mins,secs];
+
+        for(var i = 0; i < 3; i++){
+            if(i == 0 && time[i] == 0){
+                time.splice(i,1);
+                continue;
+            }
+            if(time[i] < 10){
+                time[i] = "0"+time[i];
+            }
+        }
+
+        return time.join(":");
+	}
+
+    $scope.addToQueue = mop.addToQueue;
+}]);
+
+raspberryControllers.controller('SettingsController', ['$scope','Page','mop', function($scope,Page,mop) {
     Page.setTitle("Settings");
+
+    mop.callbackReady(function(){
+        $scope.backends = mop.backends;
+        $scope.$apply();
+    });
 }]);

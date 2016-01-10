@@ -31,7 +31,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#/"><i class="fa fa-list sidebar-img"></i> Queue</a>
+                    <a href="#/"><i class="fa fa-list-ol sidebar-img"></i> Queue</a>
                 </li>
                 <li>
                     <a href="#/albums"><i class="fa fa-dot-circle-o sidebar-img"></i> Albums</a>
@@ -42,17 +42,29 @@
                 <li>
                     <a href="#/songs"><i class="fa fa-music sidebar-img"></i> Songs</a>
                 </li>
-                <li>
+	        	<li>
+                    <a href="#/playlists"><i class="fa fa-th-list sidebar-img"></i> Playlists</a>
+                </li>
+	        	<li ng-if="backends.includes('gmusic')">
+                    <a href="#/gmusic"><i class="fa fa-headphones sidebar-img"></i> Google Play</a>
+                </li>
+	        	<li ng-if="backends.includes('soundcloud')">
+                    <a href="#/soundcloud"><i class="fa fa-soundcloud sidebar-img"></i>SoundCloud</a>
+                </li>
+                <li ng-if="backends.includes('spotify')">
                     <a href="#/spotify"><i class="fa fa-spotify sidebar-img"></i> Spotify</a>
                 </li>
-                <li>
+                <li ng-if="backends.includes('youtube')">
                     <a href="#/youtube"><i class="fa fa-youtube-play sidebar-img"></i> YouTube</a>
                 </li>
 
                 <li>
                     <a href="#/radio"><i class="fa fa-microphone sidebar-img"></i> Radio/Stream</a>
                 </li>
-		<li>
+	        	<li>
+                    <a href="#/history"><i class="fa fa-history sidebar-img"></i> History</a>
+                </li>
+	        	<li>
                     <a href="#/settings"><i class="fa fa-gears sidebar-img"></i> Settings</a>
                 </li>
             </ul>

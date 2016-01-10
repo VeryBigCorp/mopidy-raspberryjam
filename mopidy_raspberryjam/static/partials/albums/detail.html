@@ -6,8 +6,8 @@
         <div class="col-md-8  col-xs-12">
            <div class="header">
                 <h1 ng-bind="album.name">Loading...</h1>
+                <h4 ng-bind-html="getArtistNames(album)"></h4>
                 <h4 ng-bind="(album.tracks != null ? 'track'.pluralize(album.tracks.length) : '')"></h4>
-                
                 <button type="button" class="btn btn-default" aria-label="Add entire album to queue">
                   <i class="fa fa-plus-circle"></i> Add Album
                 </button>

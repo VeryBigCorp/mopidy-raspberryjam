@@ -270,7 +270,7 @@ div.page-title {
     -ms-transform-style: preserve-3d;
     -o-transform-style: preserve-3d;
     transform-style: preserve-3d;
-    max-height:300px;
+    height:200px;
 }
 
 .card .card-image img{
@@ -294,6 +294,7 @@ div.page-title {
     font-family: 'Roboto', sans-serif; 
     margin-top: 10px;
     position: relative;
+    height:300px;
     -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
   -moz-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
   box-shadow: 4 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
@@ -304,13 +305,13 @@ div.page-title {
 }
 
 .card .card-content .card-title, .card-reveal .card-title{
-    font-size: 24px;
+    font-size: 15px;
     font-weight: 200;    
 }
 
 .card .card-content .card-subtitle {
     font-weight: 200;
-    font-size: 15px;
+    font-size: 13px;
 }
 
 .card .card-content .card-subsubtitle {
@@ -355,6 +356,10 @@ div.page-title {
 .card .card-reveal p{
     color: rgba(0, 0, 0, 0.71);
     margin:20px ;
+}
+
+.artist-card {
+    height:250px !important;
 }
 
 .btn-custom{
@@ -472,4 +477,8 @@ p.description_content{
 
 .album-row {
     margin-bottom:20px;
+}
+
+a.uriLink {
+    color:black;
 }
